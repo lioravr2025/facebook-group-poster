@@ -7,7 +7,7 @@
   window.__autoPosterRunning = true;
 
   // ── Config ──────────────────────────────────────────────────────────────────
-  const TASK_TIMEOUT      = 70_000;
+  const TASK_TIMEOUT      = 150_000;
   const EDITOR_WAIT       = 14_000;
   const LINK_PREVIEW_WAIT = 12_000;
   const TYPE_MIN          = 30;
@@ -478,8 +478,9 @@
   async function insertUrl(el, url) {
     el.focus();
     await sleep(400);
+    // execCommand('insertText') already fires an input event internally in Lexical —
+    // dispatching a second InputEvent with data=url causes the URL to be inserted twice.
     document.execCommand('insertText', false, url);
-    el.dispatchEvent(new InputEvent('input', { inputType: 'insertText', data: url, bubbles: true }));
     log('URL', 'insertText');
     await sleep(600);
   }
