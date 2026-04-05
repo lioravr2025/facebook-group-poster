@@ -227,11 +227,25 @@
     <div class="input-row">
       <input type="url" id="groupUrlInput" placeholder="הדבק כתובת URL של קבוצת פייסבוק...">
       <button class="btn btn-primary" id="addGroupBtn">+ הוסף</button>
+      <button class="btn btn-primary" id="importBtn" title="ייבוא רשימת קישורים">📋 ייבוא</button>
+    </div>
+    <!-- Import textarea (hidden by default) -->
+    <div id="importBox" style="display:none; margin-top:8px;">
+      <textarea id="importInput" placeholder="הדבק כתובות URL — שורה אחת לכל קבוצה..."
+                style="height:90px; margin-bottom:6px;"></textarea>
+      <div style="display:flex; gap:6px;">
+        <button class="btn btn-success" id="importConfirmBtn" style="flex:1;">✔ טען קבוצות</button>
+        <button class="btn btn-danger"  id="importCancelBtn"  style="flex:1;">✕ ביטול</button>
+      </div>
     </div>
     <div class="group-list" id="groupList">
       <div class="empty-state">לא נוספו קבוצות עדיין</div>
     </div>
-    <div class="group-count" id="groupCount"></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
+      <div class="group-count" id="groupCount"></div>
+      <button class="btn btn-danger" id="clearGroupsBtn"
+              style="display:none; padding:3px 8px; font-size:11px;">🗑 נקה הכל</button>
+    </div>
   </div>
 
   <!-- Dashboard -->

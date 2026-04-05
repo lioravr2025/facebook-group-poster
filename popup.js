@@ -29,6 +29,12 @@ const logToggleArrow = $('logToggleArrow');
 const logPanel       = $('logPanel');
 const copyLogBtn     = $('copyLogBtn');
 const clearLogBtn    = $('clearLogBtn');
+const importBtn      = $('importBtn');
+const importBox      = $('importBox');
+const importInput    = $('importInput');
+const importConfirmBtn = $('importConfirmBtn');
+const importCancelBtn  = $('importCancelBtn');
+const clearGroupsBtn   = $('clearGroupsBtn');
 
 let logPanelOpen = false;
 
@@ -78,6 +84,25 @@ function setupListeners() {
 
   addGroupBtn.addEventListener('click', addGroup);
   groupUrlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addGroup(); });
+
+  importBtn.addEventListener('click', () => {
+    importBox.style.display = importBox.style.display === 'none' ? 'block' : 'none';
+    if (importBox.style.display === 'block') importInput.focus();
+  });
+  importCancelBtn.addEventListener('click', () => {
+    importBox.style.display = 'none';
+    importInput.value = '';
+  });
+  importConfirmBtn.addEventListener('click', importGroups);
+
+  clearGroupsBtn.addEventListener('click', () => {
+    if (isRunning) return;
+    if (!confirm('למחוק את כל הקבוצות מהרשימה?')) return;
+    groups = [];
+    saveGroups();
+    renderGroupList();
+    updateButtons();
+  });
 
   startPostBtn.addEventListener('click',    () => handleStart('post'));
   startCommentBtn.addEventListener('click', () => handleStart('comment'));
@@ -200,6 +225,22 @@ function saveGroups() {
   chrome.storage.local.set({ groups });
 }
 
+function importGroups() {
+  const lines = importInput.value.split('\n').map(l => l.trim()).filter(l => l.includes('facebook.com'));
+  let added = 0;
+  for (const url of lines) {
+    if (groups.some((g) => g.url === url)) continue;
+    groups.push({ id: Date.now().toString() + Math.random(), url, name: extractGroupName(url), status: 'pending' });
+    added++;
+  }
+  importInput.value = '';
+  importBox.style.display = 'none';
+  saveGroups();
+  renderGroupList();
+  updateButtons();
+  if (added === 0) alert('לא נוספו קבוצות חדשות (כולן כבר קיימות או לא תקינות)');
+}
+
 function extractGroupName(url) {
   try {
     const m = url.match(/facebook\.com\/groups\/([^/?&#]+)/);
@@ -214,8 +255,10 @@ function renderGroupList() {
   if (groups.length === 0) {
     groupList.innerHTML = '<div class="empty-state">לא נוספו קבוצות עדיין</div>';
     groupCount.textContent = '';
+    clearGroupsBtn.style.display = 'none';
     return;
   }
+  clearGroupsBtn.style.display = isRunning ? 'none' : 'inline-block';
 
   const pending    = groups.filter((g) => g.status === 'pending').length;
   const success    = groups.filter((g) => g.status === 'success').length;
