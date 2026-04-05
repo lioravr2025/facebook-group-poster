@@ -441,6 +441,22 @@
   //  Typing helpers
   // ────────────────────────────────────────────────────────────────────────────
 
+  // pressEnter: fires real keyboard events + execCommand for maximum Lexical compatibility
+  async function pressEnter(el) {
+    el.focus();
+    await sleep(60);
+    el.dispatchEvent(new KeyboardEvent('keydown', {
+      key: 'Enter', code: 'Enter', keyCode: 13,
+      bubbles: true, cancelable: true, view: window,
+    }));
+    document.execCommand('insertParagraph', false);
+    el.dispatchEvent(new KeyboardEvent('keyup', {
+      key: 'Enter', code: 'Enter', keyCode: 13,
+      bubbles: true, view: window,
+    }));
+    await sleep(120);
+  }
+
   async function humanType(el, text) {
     el.focus();
     await sleep(500);
@@ -448,9 +464,7 @@
 
     for (const char of text) {
       if (char === '\n') {
-        // Use insertParagraph so Lexical/React creates a real paragraph break
-        document.execCommand('insertParagraph', false);
-        await sleep(90);
+        await pressEnter(el);
       } else {
         document.execCommand('insertText', false, char);
         el.dispatchEvent(new InputEvent('input', { inputType: 'insertText', data: char, bubbles: true }));
@@ -572,13 +586,9 @@
     if (title && title.trim()) {
       log('TYPE', `Typing title: "${title.slice(0, 40)}"`);
       await humanType(editor, title.trim());
-      // Re-focus and wait before inserting paragraph breaks
-      editor.focus();
-      await sleep(500);
-      document.execCommand('insertParagraph', false);
-      await sleep(300);
-      document.execCommand('insertParagraph', false);
-      await sleep(500);
+      // One blank line after title (2 x Enter)
+      await pressEnter(editor);
+      await pressEnter(editor);
     }
 
     const formattedContent = formatContent(content);
@@ -598,17 +608,10 @@
     if (url && mode === 'post') {
       log('URL', 'Inserting URL with 2 blank lines above...');
 
-      // Re-focus before inserting paragraph breaks
-      editor.focus();
-      await sleep(500);
-
-      // 2 blank lines BEFORE url (three insertParagraph = two blank lines)
-      document.execCommand('insertParagraph', false);
-      await sleep(300);
-      document.execCommand('insertParagraph', false);
-      await sleep(300);
-      document.execCommand('insertParagraph', false);
-      await sleep(500);
+      // 2 blank lines BEFORE url (3 x Enter)
+      await pressEnter(editor);
+      await pressEnter(editor);
+      await pressEnter(editor);
 
       await insertUrl(editor, url);
 
