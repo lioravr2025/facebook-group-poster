@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>פרסום אוטומטי לקבוצות פייסבוק</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f0f2f5;
+      width: 480px;
+      color: #1c1e21;
+      direction: rtl;
+    }
+
+    .header {
+      background: #1877f2;
+      color: white;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .main {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .card-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #606770;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    textarea, input[type="url"], input[type="text"] {
+      width: 100%;
+      border: 1.5px solid #e4e6ea;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 14px;
+      font-family: inherit;
+      direction: rtl;
+      outline: none;
+      transition: border-color 0.15s;
+      background: #f7f8fa;
+    }
+
+    textarea { resize: none; height: 75px; margin-bottom: 8px; }
+    textarea:focus, input:focus { border-color: #1877f2; background: white; }
+
+    .preview-box {
+      background: #f0f2f5;
+      border: 1.5px dashed #bcc0c4;
+      border-radius: 6px;
+      padding: 10px;
+      min-height: 50px;
+      font-size: 14px;
+      word-break: break-word;
+      line-height: 1.5;
+    }
+
+    .input-row { display: flex; gap: 8px; margin-bottom: 8px; }
+    .input-row input { flex: 1; margin-bottom: 0; }
+
+    .btn {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      transition: opacity 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+    .btn:hover:not(:disabled) { opacity: 0.88; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .btn-primary  { background: #1877f2; color: white; }
+    .btn-danger   { background: #fa3e3e; color: white; }
+    .btn-success  { background: #42b72a; color: white; }
+
+    /* Group list */
+    .group-list {
+      max-height: 160px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .group-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      background: #f0f2f5;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    .status-icon { width: 22px; text-align: center; flex-shrink: 0; font-size: 15px; }
+
+    .group-info { flex: 1; min-width: 0; }
+    .group-name { font-weight: 600; color: #1c1e21; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .group-url  { font-size: 11px; color: #8a8d91; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .group-error { font-size: 11px; color: #fa3e3e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .btn-delete {
+      background: none; border: none; cursor: pointer;
+      color: #bcc0c4; font-size: 17px; padding: 0 2px; line-height: 1; flex-shrink: 0;
+    }
+    .btn-delete:hover { color: #fa3e3e; }
+
+    .empty-state {
+      text-align: center; color: #bcc0c4; font-size: 13px; padding: 14px;
+    }
+
+    .group-count { font-size: 11px; color: #8a8d91; margin-top: 5px; }
+
+    /* Dashboard */
+    .progress-header {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 6px; font-size: 13px; font-weight: 600;
+    }
+
+    .progress-bar-wrap {
+      background: #e4e6ea; border-radius: 99px; height: 7px; margin-bottom: 8px; overflow: hidden;
+    }
+
+    .progress-bar {
+      background: #1877f2; height: 100%; border-radius: 99px;
+      transition: width 0.4s ease;
+    }
+
+    .countdown {
+      text-align: center; font-size: 12px; color: #606770;
+      background: #f0f2f5; border-radius: 4px; padding: 4px 8px;
+      min-height: 24px;
+    }
+
+    /* Actions */
+    .action-row { display: flex; gap: 8px; padding-bottom: 2px; }
+    .action-row .btn { flex: 1; padding: 10px; font-size: 14px; }
+
+    /* Log panel */
+    .log-toggle {
+      width: 100%; background: none; border: 1px solid #e4e6ea;
+      border-radius: 6px; padding: 7px 10px; cursor: pointer;
+      font-size: 12px; color: #606770; font-family: inherit;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .log-toggle:hover { background: #f0f2f5; }
+    .log-panel {
+      background: #1a1a2e; border-radius: 6px; padding: 10px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 11px; line-height: 1.6; direction: ltr;
+      max-height: 220px; overflow-y: auto; text-align: left;
+    }
+    .log-line { color: #a0d8ef; white-space: pre-wrap; word-break: break-all; }
+    .log-line.err  { color: #ff6b6b; }
+    .log-line.ok   { color: #6bff9e; }
+    .log-line.warn { color: #ffd93d; }
+    .log-status-ok   { color: #6bff9e; font-weight: 700; }
+    .log-status-fail { color: #ff6b6b; font-weight: 700; }
+
+    /* Status colours */
+    .s-pending    { color: #bcc0c4; }
+    .s-processing { color: #1877f2; }
+    .s-success    { color: #42b72a; }
+    .s-failed     { color: #fa3e3e; }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #bcc0c4; border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <span>📢</span>
+  <span>פרסום אוטומטי לקבוצות פייסבוק</span>
+</div>
+
+<div class="main">
+
+  <!-- Content -->
+  <div class="card">
+    <div class="card-title">כותרת הפוסט</div>
+    <input type="text" id="postTitle"
+           placeholder="כותרת — תופיע בשורה ראשונה ומובלטת..."
+           style="margin-bottom:10px;">
+
+    <div class="card-title">גוף הפוסט</div>
+    <textarea id="postContent" placeholder="תוכן הפוסט — רווחים ישמרו כמו שהם..."></textarea>
+
+    <div class="card-title">קישור</div>
+    <input type="url" id="postUrl"
+           placeholder="https://... (אופציונלי — יופיע 2 שורות מתחת לתוכן)"
+           style="margin-bottom:10px;">
+
+    <div class="card-title">תצוגה מקדימה</div>
+    <div class="preview-box" id="previewBox">
+      <span style="color:#bcc0c4;">תצוגה מקדימה תופיע כאן...</span>
+    </div>
+  </div>
+
+  <!-- Groups -->
+  <div class="card">
+    <div class="card-title">קבוצות יעד</div>
+    <div class="input-row">
+      <input type="url" id="groupUrlInput" placeholder="הדבק כתובת URL של קבוצת פייסבוק...">
+      <button class="btn btn-primary" id="addGroupBtn">+ הוסף</button>
+    </div>
+    <div class="group-list" id="groupList">
+      <div class="empty-state">לא נוספו קבוצות עדיין</div>
+    </div>
+    <div class="group-count" id="groupCount"></div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="card" id="dashboard" style="display:none;">
+    <div class="card-title">דוח התקדמות</div>
+    <div class="progress-header">
+      <span id="progressText">0/0 קבוצות</span>
+      <span id="progressPercent" style="color:#1877f2;">0%</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progressBar" style="width:0%"></div>
+    </div>
+    <div class="countdown" id="countdown"></div>
+  </div>
+
+  <!-- Actions -->
+  <div class="action-row" style="flex-wrap:wrap; gap:8px;">
+    <button class="btn btn-success" id="startPostBtn"    style="flex:1 1 45%;">📝 התחל פרסום פוסט</button>
+    <button class="btn btn-primary" id="startCommentBtn" style="flex:1 1 45%;">💬 התחל פרסום תגובה</button>
+    <button class="btn btn-danger"  id="stopBtn" disabled style="flex:1 1 100%;">⏹ עצור הכל</button>
+  </div>
+
+  <!-- Log panel -->
+  <div id="logSection" style="display:none;">
+    <div style="display:flex; gap:6px;">
+      <button class="log-toggle" id="logToggle" style="flex:1;">
+        <span id="logToggleLabel">📋 לוג ריצה אחרונה</span>
+        <span id="logToggleArrow">▼</span>
+      </button>
+      <button class="btn btn-primary" id="copyLogBtn"
+              style="flex-shrink:0; padding:6px 10px; font-size:12px;">
+        העתק
+      </button>
+    </div>
+    <div id="logPanel" class="log-panel" style="display:none; margin-top:4px;"></div>
+  </div>
+
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>

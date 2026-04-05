@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>יצירת צלמות לתוסף</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; padding: 40px; gap: 24px; }
+    h2   { color: #1877f2; margin: 0; }
+    .row { display: flex; gap: 32px; align-items: flex-end; background: white; padding: 24px 32px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .item { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 13px; color: #606770; }
+    canvas { border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+    .note { font-size: 13px; color: #606770; text-align: center; max-width: 420px; line-height: 1.6; background: #fff8e1; border: 1px solid #ffe082; border-radius: 8px; padding: 12px 16px; }
+  </style>
+</head>
+<body>
+  <h2>🎨 צלמות התוסף — הורדה אוטומטית</h2>
+
+  <div class="row" id="preview"></div>
+
+  <div class="note">
+    הקבצים יורדו אוטומטית לתיקיית ההורדות שלך.<br>
+    העבר אותם לתיקיית <strong>icons/</strong> שבתוך התוסף.
+  </div>
+
+  <script>
+    const SIZES = [16, 48, 128];
+
+    function drawIcon(size) {
+      const canvas = document.createElement('canvas');
+      canvas.width  = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const s = size;
+
+      // ── Rounded blue background ───────────────────────────────────────────
+      ctx.fillStyle = '#1877f2';
+      ctx.beginPath();
+      const r = s * 0.2;
+      if (ctx.roundRect) {
+        ctx.roundRect(0, 0, s, s, r);
+      } else {
+        ctx.moveTo(r, 0);
+        ctx.lineTo(s - r, 0); ctx.quadraticCurveTo(s, 0, s, r);
+        ctx.lineTo(s, s - r); ctx.quadraticCurveTo(s, s, s - r, s);
+        ctx.lineTo(r, s);     ctx.quadraticCurveTo(0, s, 0, s - r);
+        ctx.lineTo(0, r);     ctx.quadraticCurveTo(0, 0, r, 0);
+      }
+      ctx.fill();
+
+      // ── Broadcast arcs (pointing up = broadcasting to groups) ─────────────
+      const cx = s * 0.5;
+      const cy = s * 0.60;   // anchor point (slightly below centre)
+
+      const arcStart = Math.PI * 1.13;
+      const arcEnd   = Math.PI * 1.87;
+
+      ctx.strokeStyle = 'white';
+      ctx.lineCap     = 'round';
+
+      // Three concentric arcs, thinnest outward
+      const arcs = [
+        { radius: 0.175, width: 0.09  },
+        { radius: 0.285, width: 0.079 },
+        { radius: 0.395, width: 0.068 },
+      ];
+
+      arcs.forEach(({ radius, width }) => {
+        ctx.lineWidth = s * width;
+        ctx.beginPath();
+        ctx.arc(cx, cy, s * radius, arcStart, arcEnd);
+        ctx.stroke();
+      });
+
+      // Centre dot (the "transmitter")
+      ctx.fillStyle = 'white';
+      ctx.beginPath();
+      ctx.arc(cx, cy, s * 0.063, 0, Math.PI * 2);
+      ctx.fill();
+
+      // ── Small orange badge: ⚡ (automation hint) ─────────────────────────
+      // Only for sizes ≥ 48 — too small to see at 16px
+      if (s >= 48) {
+        const bx = s * 0.77;
+        const by = s * 0.24;
+        const br = s * 0.155;
+
+        // Badge circle — dark blue border + white fill
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(bx, by, br, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#1877f2';
+        ctx.lineWidth   = s * 0.04;
+        ctx.beginPath();
+        ctx.arc(bx, by, br, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Lightning bolt (⚡) inside badge
+        ctx.fillStyle   = '#f59e0b';  // amber
+        ctx.font        = `bold ${Math.round(s * 0.2)}px Arial`;
+        ctx.textAlign   = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('⚡', bx, by + s * 0.008);
+      }
+
+      return canvas;
+    }
+
+    // ── Render preview + auto-download ────────────────────────────────────────
+    const preview = document.getElementById('preview');
+
+    SIZES.forEach((size) => {
+      const canvas = drawIcon(size);
+
+      // Preview (scaled up if tiny)
+      const displaySize = Math.max(size, 64);
+      const display = canvas.cloneNode();
+      display.width  = size;
+      display.height = size;
+      display.getContext('2d').drawImage(canvas, 0, 0);
+      display.style.width  = displaySize + 'px';
+      display.style.height = displaySize + 'px';
+      display.style.imageRendering = 'pixelated';
+
+      const item = document.createElement('div');
+      item.className = 'item';
+      item.innerHTML = `<span>${size}×${size}</span>`;
+      item.prepend(display);
+      preview.appendChild(item);
+
+      // Auto-download as PNG
+      canvas.toBlob((blob) => {
+        const a  = document.createElement('a');
+        a.href   = URL.createObjectURL(blob);
+        a.download = `icon${size}.png`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }, 'image/png');
+    });
+  </script>
+</body>
+</html>
