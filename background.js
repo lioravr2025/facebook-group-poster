@@ -24,7 +24,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
     case 'POST_RESULT':
       handlePostResult(sender.tab?.id, msg.success, msg.error);
-      break;
+      return true; // async fallback path uses await
   }
 });
 
@@ -165,16 +165,35 @@ async function scheduleNext() {
 
 // ─── Post Result Handler ──────────────────────────────────────────────────────
 
-function handlePostResult(tabId, success, error) {
+async function handlePostResult(tabId, success, error) {
   if (tabId == null) return;
   const pending = pendingResults.get(tabId);
-  if (!pending) return;
 
-  clearTimeout(pending.timer);
-  pendingResults.delete(tabId);
+  if (pending) {
+    // Normal path: service worker was alive, resolve/reject the waiting promise
+    clearTimeout(pending.timer);
+    pendingResults.delete(tabId);
+    if (success) pending.resolve();
+    else         pending.reject(new Error(error || 'Post failed'));
+    return;
+  }
 
-  if (success) pending.resolve();
-  else         pending.reject(new Error(error || 'Post failed'));
+  // Fallback: service worker was killed and restarted while waiting.
+  // pendingResults is empty — processNext() chain is dead.
+  // Update the group directly from storage and restart the queue.
+  console.warn('[AutoPoster] SW was restarted — handling result via storage fallback');
+  const data   = await load(['groups']);
+  const groups = data.groups || [];
+  const idx    = groups.findIndex(g => g.status === 'processing');
+  if (idx !== -1) {
+    groups[idx].status = success ? 'success' : 'failed';
+    if (!success && error) groups[idx].error = error;
+    await store({ groups });
+  }
+
+  chrome.tabs.remove(tabId).catch(() => {});
+  processingTabId = null;
+  scheduleNext();
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
