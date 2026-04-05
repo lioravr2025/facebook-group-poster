@@ -337,26 +337,40 @@
   // ────────────────────────────────────────────────────────────────────────────
 
   function findPostButton(mode) {
-    const root = document.querySelector('[role="dialog"]') || document;
-
     // For new posts: פרסם / Post
     // For comments:  פרסם תגובה / פרסם / Enter key (handled separately)
     const LABELS = mode === 'post'
       ? ['פרסם', 'פרסום', 'Post', 'שתף', 'Share', 'פרסמי']
       : ['פרסם תגובה', 'פרסם', 'Post comment', 'Post', 'Reply'];
 
-    for (const label of LABELS) {
-      const el = root.querySelector(`[aria-label="${label}"]`);
-      if (el) { log('BTN', `aria="${label}"`); return el; }
+    // Search every open dialog first, then fall back to the full document.
+    // Using only the first dialog is wrong when multiple dialogs are open
+    // (e.g. notifications panel + post-composer dialog).
+    const dialogs = [...document.querySelectorAll('[role="dialog"]')];
+    const roots   = dialogs.length ? [...dialogs, document] : [document];
+
+    for (const root of roots) {
+      for (const label of LABELS) {
+        const el = root.querySelector(`[aria-label="${label}"]`);
+        if (el && !el.closest('[role="article"]')) {
+          log('BTN', `aria="${label}" root=${root === document ? 'doc' : 'dialog'}`);
+          return el;
+        }
+      }
+      for (const el of root.querySelectorAll('[role="button"], button')) {
+        const t = (el.innerText || el.textContent).trim();
+        if (LABELS.includes(t) && !el.closest('[role="article"]')) {
+          log('BTN', `text="${t}"`);
+          return el;
+        }
+      }
     }
-    for (const el of root.querySelectorAll('[role="button"], button')) {
+
+    // Partial match across whole document (exclude articles)
+    for (const el of document.querySelectorAll('[role="button"], button')) {
+      if (el.closest('[role="article"]')) continue;
       const t = (el.innerText || el.textContent).trim();
-      if (LABELS.includes(t)) { log('BTN', `text="${t}"`); return el; }
-    }
-    // Partial match
-    for (const el of root.querySelectorAll('[role="button"], button')) {
-      const t = (el.innerText || el.textContent).trim();
-      if (/^פרסמ/.test(t) || t.startsWith('Post') || t.startsWith('Reply')) {
+      if (/^פרסמ/.test(t) || t === 'Post' || t === 'Reply') {
         log('BTN', `partial="${t}"`);
         return el;
       }
