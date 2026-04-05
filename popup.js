@@ -28,6 +28,7 @@ const logToggleLabel = $('logToggleLabel');
 const logToggleArrow = $('logToggleArrow');
 const logPanel       = $('logPanel');
 const copyLogBtn     = $('copyLogBtn');
+const clearLogBtn    = $('clearLogBtn');
 
 let logPanelOpen = false;
 
@@ -109,6 +110,16 @@ function setupListeners() {
         copyLogBtn.textContent = '❌';
         setTimeout(() => { copyLogBtn.textContent = 'העתק'; }, 2000);
       }
+    });
+  });
+
+  clearLogBtn.addEventListener('click', () => {
+    chrome.storage.local.remove('lastRunLogs', () => {
+      logSection.style.display = 'none';
+      logPanel.innerHTML = '';
+      logPanelOpen = false;
+      logPanel.style.display = 'none';
+      logToggleArrow.textContent = '▼';
     });
   });
 }
