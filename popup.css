@@ -1,0 +1,607 @@
+/* popup.css – Facebook Group Auto-Poster v2.0 */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f0f2f5;
+  width: 500px;
+  color: #1c1e21;
+  direction: rtl;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+
+.header {
+  background: #1877f2;
+  color: white;
+  padding: 11px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.header-title {
+  flex: 1;
+}
+
+.header-version {
+  background: rgba(255,255,255,0.22);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 99px;
+  letter-spacing: 0.3px;
+}
+
+/* ── Tab Bar ─────────────────────────────────────────────────────────────── */
+
+.tab-bar {
+  display: flex;
+  background: white;
+  border-bottom: 2px solid #e4e6ea;
+  padding: 0 8px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 9px 4px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  color: #606770;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.tab-btn:hover {
+  color: #1877f2;
+}
+
+.tab-btn.active {
+  color: #1877f2;
+  border-bottom-color: #1877f2;
+}
+
+/* ── Tab Panes ───────────────────────────────────────────────────────────── */
+
+.tab-pane {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  max-height: 510px;
+  overflow-y: auto;
+}
+
+.tab-pane.active {
+  display: flex;
+}
+
+/* ── Card ────────────────────────────────────────────────────────────────── */
+
+.card {
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.card-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #606770;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.card-header .card-title {
+  margin-bottom: 0;
+}
+
+/* ── Field Label ─────────────────────────────────────────────────────────── */
+
+.field-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #606770;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* ── Inputs / Textarea / Select ─────────────────────────────────────────── */
+
+input[type="text"],
+input[type="url"],
+input[type="number"],
+input[type="datetime-local"],
+textarea,
+select {
+  width: 100%;
+  border: 1.5px solid #e4e6ea;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 14px;
+  font-family: inherit;
+  direction: rtl;
+  outline: none;
+  transition: border-color 0.15s;
+  background: #f7f8fa;
+  color: #1c1e21;
+  margin-bottom: 8px;
+}
+
+input[type="text"]:focus,
+input[type="url"]:focus,
+input[type="number"]:focus,
+input[type="datetime-local"]:focus,
+textarea:focus,
+select:focus {
+  border-color: #1877f2;
+  background: white;
+}
+
+input[type="datetime-local"] {
+  direction: ltr;
+  text-align: left;
+}
+
+textarea {
+  resize: none;
+  height: 80px;
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23606770' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 10px center;
+  padding-left: 28px;
+}
+
+/* ── Spintax Hint ────────────────────────────────────────────────────────── */
+
+.spintax-hint {
+  background: #fffbe6;
+  border: 1px solid #ffe58f;
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 12px;
+  color: #7a6200;
+  direction: rtl;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.spintax-hint code {
+  background: #fff3b0;
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 11px;
+  color: #b35900;
+  direction: ltr;
+  display: inline-block;
+}
+
+/* ── Preview Box ─────────────────────────────────────────────────────────── */
+
+.preview-box {
+  background: #f0f2f5;
+  border: 1.5px dashed #bcc0c4;
+  border-radius: 6px;
+  padding: 10px;
+  min-height: 50px;
+  font-size: 14px;
+  word-break: break-word;
+  line-height: 1.5;
+  margin-bottom: 0;
+}
+
+/* ── Delay Row ───────────────────────────────────────────────────────────── */
+
+.delay-row {
+  display: flex;
+  gap: 10px;
+}
+
+.delay-field {
+  flex: 1;
+}
+
+.delay-field input {
+  margin-bottom: 0;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+
+.btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  transition: opacity 0.15s, background 0.15s;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.btn:hover:not(:disabled) { opacity: 0.88; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn-primary  { background: #1877f2; color: white; }
+.btn-success  { background: #42b72a; color: white; }
+.btn-danger   { background: #fa3e3e; color: white; }
+.btn-ghost    { background: #e4e6ea; color: #1c1e21; }
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+/* ── Action Row ──────────────────────────────────────────────────────────── */
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 2px;
+}
+
+.action-row .btn-start {
+  flex: 1 1 45%;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.action-row .btn-stop {
+  flex: 1 1 100%;
+  padding: 10px;
+  font-size: 14px;
+}
+
+/* ── Progress / Dashboard ────────────────────────────────────────────────── */
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.progress-bar-wrap {
+  background: #e4e6ea;
+  border-radius: 99px;
+  height: 7px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  background: #1877f2;
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+
+.countdown {
+  text-align: center;
+  font-size: 12px;
+  color: #606770;
+  background: #f0f2f5;
+  border-radius: 4px;
+  padding: 4px 8px;
+  min-height: 24px;
+}
+
+.group-stats {
+  font-size: 12px;
+  color: #606770;
+  text-align: center;
+  margin-top: 4px;
+}
+
+.group-count-info {
+  font-size: 11px;
+  color: #8a8d91;
+  margin-top: 2px;
+  margin-bottom: 4px;
+}
+
+/* ── Tab Toolbar ─────────────────────────────────────────────────────────── */
+
+.tab-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.tab-toolbar span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1c1e21;
+  flex: 1;
+}
+
+/* ── List Card ───────────────────────────────────────────────────────────── */
+
+.list-card {
+  background: white;
+  border: 1.5px solid #e4e6ea;
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  transition: border-color 0.15s;
+}
+
+.list-card:hover {
+  border-color: #1877f2;
+}
+
+.list-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.list-card-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1c1e21;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.list-card-count {
+  font-size: 11px;
+  color: #8a8d91;
+  margin-top: 1px;
+}
+
+/* ── Group List ──────────────────────────────────────────────────────────── */
+
+.group-list {
+  max-height: 200px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.group-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px;
+  background: #f0f2f5;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.group-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.group-item-name {
+  font-weight: 600;
+  color: #1c1e21;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.group-item-url {
+  font-size: 11px;
+  color: #8a8d91;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Btn Icon (delete) ───────────────────────────────────────────────────── */
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #bcc0c4;
+  font-size: 16px;
+  padding: 2px 4px;
+  line-height: 1;
+  flex-shrink: 0;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.btn-icon:hover {
+  color: #fa3e3e;
+  background: #fff0f0;
+}
+
+/* ── Input Row ───────────────────────────────────────────────────────────── */
+
+.input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  align-items: flex-start;
+}
+
+.input-row input,
+.input-row select {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.input-row .btn {
+  flex-shrink: 0;
+  margin-top: 0;
+}
+
+/* ── Form Actions ────────────────────────────────────────────────────────── */
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* ── Campaign Items ──────────────────────────────────────────────────────── */
+
+.camp-item {
+  background: #f7f8fa;
+  border: 1.5px solid #e4e6ea;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+}
+
+.camp-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.camp-item-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1c1e21;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.camp-item-meta {
+  font-size: 11px;
+  color: #8a8d91;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ── Campaign Status Badges ──────────────────────────────────────────────── */
+
+.camp-status {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 99px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+
+.camp-status.pending  { background: #f0f2f5; color: #8a8d91; }
+.camp-status.running  { background: #e7f3ff; color: #1877f2; }
+.camp-status.done     { background: #e6f9ee; color: #2d9e56; }
+.camp-status.failed   { background: #fff0f0; color: #fa3e3e; }
+
+/* ── Report Header ───────────────────────────────────────────────────────── */
+
+.report-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.report-header > div:first-child {
+  flex: 1;
+  font-size: 12px;
+  color: #606770;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Log Panel ───────────────────────────────────────────────────────────── */
+
+.log-panel {
+  background: #1a1a2e;
+  border-radius: 6px;
+  padding: 10px;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  direction: ltr;
+  max-height: 300px;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.log-line {
+  color: #a0d8ef;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.log-line.ok   { color: #6bff9e; }
+.log-line.err  { color: #ff6b6b; }
+.log-line.warn { color: #ffd93d; }
+
+/* ── Empty State ─────────────────────────────────────────────────────────── */
+
+.empty-state {
+  text-align: center;
+  color: #bcc0c4;
+  font-size: 13px;
+  padding: 18px;
+}
+
+/* ── Status Colors ───────────────────────────────────────────────────────── */
+
+.s-pending    { color: #bcc0c4; }
+.s-processing { color: #1877f2; }
+.s-success    { color: #42b72a; }
+.s-failed     { color: #fa3e3e; }
+
+/* ── Group Count ─────────────────────────────────────────────────────────── */
+
+.group-count {
+  font-size: 11px;
+  color: #8a8d91;
+  margin-top: 5px;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #bcc0c4; border-radius: 2px; }

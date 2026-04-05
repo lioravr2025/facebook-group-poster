@@ -2,292 +2,257 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>פרסום אוטומטי לקבוצות פייסבוק</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: #f0f2f5;
-      width: 480px;
-      color: #1c1e21;
-      direction: rtl;
-    }
-
-    .header {
-      background: #1877f2;
-      color: white;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 15px;
-      font-weight: 700;
-    }
-
-    .main {
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .card {
-      background: white;
-      border-radius: 8px;
-      padding: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-
-    .card-title {
-      font-size: 11px;
-      font-weight: 700;
-      color: #606770;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    textarea, input[type="url"], input[type="text"] {
-      width: 100%;
-      border: 1.5px solid #e4e6ea;
-      border-radius: 6px;
-      padding: 8px 10px;
-      font-size: 14px;
-      font-family: inherit;
-      direction: rtl;
-      outline: none;
-      transition: border-color 0.15s;
-      background: #f7f8fa;
-    }
-
-    textarea { resize: none; height: 75px; margin-bottom: 8px; }
-    textarea:focus, input:focus { border-color: #1877f2; background: white; }
-
-    .preview-box {
-      background: #f0f2f5;
-      border: 1.5px dashed #bcc0c4;
-      border-radius: 6px;
-      padding: 10px;
-      min-height: 50px;
-      font-size: 14px;
-      word-break: break-word;
-      line-height: 1.5;
-    }
-
-    .input-row { display: flex; gap: 8px; margin-bottom: 8px; }
-    .input-row input { flex: 1; margin-bottom: 0; }
-
-    .btn {
-      padding: 8px 14px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 700;
-      font-family: inherit;
-      transition: opacity 0.15s, background 0.15s;
-      white-space: nowrap;
-    }
-    .btn:hover:not(:disabled) { opacity: 0.88; }
-    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-
-    .btn-primary  { background: #1877f2; color: white; }
-    .btn-danger   { background: #fa3e3e; color: white; }
-    .btn-success  { background: #42b72a; color: white; }
-
-    /* Group list */
-    .group-list {
-      max-height: 160px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .group-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 8px;
-      background: #f0f2f5;
-      border-radius: 6px;
-      font-size: 13px;
-    }
-
-    .status-icon { width: 22px; text-align: center; flex-shrink: 0; font-size: 15px; }
-
-    .group-info { flex: 1; min-width: 0; }
-    .group-name { font-weight: 600; color: #1c1e21; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .group-url  { font-size: 11px; color: #8a8d91; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .group-error { font-size: 11px; color: #fa3e3e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-    .btn-delete {
-      background: none; border: none; cursor: pointer;
-      color: #bcc0c4; font-size: 17px; padding: 0 2px; line-height: 1; flex-shrink: 0;
-    }
-    .btn-delete:hover { color: #fa3e3e; }
-
-    .empty-state {
-      text-align: center; color: #bcc0c4; font-size: 13px; padding: 14px;
-    }
-
-    .group-count { font-size: 11px; color: #8a8d91; margin-top: 5px; }
-
-    /* Dashboard */
-    .progress-header {
-      display: flex; justify-content: space-between;
-      align-items: center; margin-bottom: 6px; font-size: 13px; font-weight: 600;
-    }
-
-    .progress-bar-wrap {
-      background: #e4e6ea; border-radius: 99px; height: 7px; margin-bottom: 8px; overflow: hidden;
-    }
-
-    .progress-bar {
-      background: #1877f2; height: 100%; border-radius: 99px;
-      transition: width 0.4s ease;
-    }
-
-    .countdown {
-      text-align: center; font-size: 12px; color: #606770;
-      background: #f0f2f5; border-radius: 4px; padding: 4px 8px;
-      min-height: 24px;
-    }
-
-    /* Actions */
-    .action-row { display: flex; gap: 8px; padding-bottom: 2px; }
-    .action-row .btn { flex: 1; padding: 10px; font-size: 14px; }
-
-    /* Log panel */
-    .log-toggle {
-      width: 100%; background: none; border: 1px solid #e4e6ea;
-      border-radius: 6px; padding: 7px 10px; cursor: pointer;
-      font-size: 12px; color: #606770; font-family: inherit;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .log-toggle:hover { background: #f0f2f5; }
-    .log-panel {
-      background: #1a1a2e; border-radius: 6px; padding: 10px;
-      font-family: 'Consolas', 'Courier New', monospace;
-      font-size: 11px; line-height: 1.6; direction: ltr;
-      max-height: 220px; overflow-y: auto; text-align: left;
-    }
-    .log-line { color: #a0d8ef; white-space: pre-wrap; word-break: break-all; }
-    .log-line.err  { color: #ff6b6b; }
-    .log-line.ok   { color: #6bff9e; }
-    .log-line.warn { color: #ffd93d; }
-    .log-status-ok   { color: #6bff9e; font-weight: 700; }
-    .log-status-fail { color: #ff6b6b; font-weight: 700; }
-
-    /* Status colours */
-    .s-pending    { color: #bcc0c4; }
-    .s-processing { color: #1877f2; }
-    .s-success    { color: #42b72a; }
-    .s-failed     { color: #fa3e3e; }
-
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #bcc0c4; border-radius: 2px; }
-  </style>
+  <title>AutoPoster – פרסום אוטומטי לקבוצות פייסבוק</title>
+  <link rel="stylesheet" href="popup.css">
 </head>
 <body>
 
+<!-- ── Header ──────────────────────────────────────────────────────────── -->
 <div class="header">
   <span>📢</span>
-  <span>פרסום אוטומטי לקבוצות פייסבוק</span>
+  <span class="header-title">AutoPoster</span>
+  <span class="header-version">v2.0</span>
 </div>
 
-<div class="main">
+<!-- ── Tab Bar ─────────────────────────────────────────────────────────── -->
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="tab-main">✏️ ראשי</button>
+  <button class="tab-btn" data-tab="tab-groups">👥 קבוצות</button>
+  <button class="tab-btn" data-tab="tab-schedule">🗓 תזמון</button>
+  <button class="tab-btn" data-tab="tab-reports">📊 דוחות</button>
+</div>
 
-  <!-- Content -->
+<!-- ════════════════════════════════════════════════════════════════════════
+     TAB: MAIN
+     ════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-pane active" id="tab-main">
+
+  <!-- Post Content Card -->
   <div class="card">
-    <div class="card-title">כותרת הפוסט</div>
-    <input type="text" id="postTitle"
-           placeholder="כותרת — תופיע בשורה ראשונה ומובלטת..."
-           style="margin-bottom:10px;">
+    <div class="card-header">
+      <div class="card-title">תוכן הפוסט</div>
+      <button class="btn btn-ghost btn-sm" id="clearFieldsBtn">🗑 נקה שדות</button>
+    </div>
 
-    <div class="card-title">גוף הפוסט</div>
+    <div class="spintax-hint">
+      💡 ניתן להשתמש ב-Spintax: <code>{אפשרות1|אפשרות2|אפשרות3}</code>
+    </div>
+
+    <div class="field-label">כותרת</div>
+    <input type="text" id="postTitle" placeholder="כותרת — תופיע בשורה ראשונה ומובלטת...">
+
+    <div class="field-label">גוף הפוסט</div>
     <textarea id="postContent" placeholder="תוכן הפוסט — רווחים ישמרו כמו שהם..."></textarea>
 
-    <div class="card-title">קישור</div>
-    <input type="url" id="postUrl"
-           placeholder="https://... (אופציונלי — יופיע 2 שורות מתחת לתוכן)"
-           style="margin-bottom:10px;">
+    <div class="field-label">קישור (אופציונלי)</div>
+    <input type="url" id="postUrl" placeholder="https://... (יופיע מתחת לתוכן)">
 
-    <div class="card-title">תצוגה מקדימה</div>
+    <div class="field-label">תצוגה מקדימה</div>
     <div class="preview-box" id="previewBox">
       <span style="color:#bcc0c4;">תצוגה מקדימה תופיע כאן...</span>
     </div>
   </div>
 
-  <!-- Groups -->
+  <!-- Run Settings Card -->
   <div class="card">
-    <div class="card-title">קבוצות יעד</div>
-    <div class="input-row">
-      <input type="url" id="groupUrlInput" placeholder="הדבק כתובת URL של קבוצת פייסבוק...">
-      <button class="btn btn-primary" id="addGroupBtn">+ הוסף</button>
-      <button class="btn btn-primary" id="importBtn" title="ייבוא רשימת קישורים">📋 ייבוא</button>
-    </div>
-    <!-- Import textarea (hidden by default) -->
-    <div id="importBox" style="display:none; margin-top:8px;">
-      <textarea id="importInput" placeholder="הדבק כתובות URL — שורה אחת לכל קבוצה..."
-                style="height:90px; margin-bottom:6px;"></textarea>
-      <div style="display:flex; gap:6px;">
-        <button class="btn btn-success" id="importConfirmBtn" style="flex:1;">✔ טען קבוצות</button>
-        <button class="btn btn-danger"  id="importCancelBtn"  style="flex:1;">✕ ביטול</button>
+    <div class="card-title">הגדרות ריצה</div>
+
+    <div class="field-label">רשימת קבוצות</div>
+    <select id="listSelector">
+      <option value="">— בחר רשימה —</option>
+    </select>
+    <div class="group-count-info" id="listGroupCount"></div>
+
+    <div class="delay-row">
+      <div class="delay-field">
+        <div class="field-label">השהיה מינימלית (שנ׳)</div>
+        <input type="number" id="delayMin" min="10" value="110">
       </div>
-    </div>
-    <div class="group-list" id="groupList">
-      <div class="empty-state">לא נוספו קבוצות עדיין</div>
-    </div>
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
-      <div class="group-count" id="groupCount"></div>
-      <button class="btn btn-danger" id="clearGroupsBtn"
-              style="display:none; padding:3px 8px; font-size:11px;">🗑 נקה הכל</button>
+      <div class="delay-field">
+        <div class="field-label">השהיה מקסימלית (שנ׳)</div>
+        <input type="number" id="delayMax" min="10" value="130">
+      </div>
     </div>
   </div>
 
-  <!-- Dashboard -->
+  <!-- Dashboard (hidden until running) -->
   <div class="card" id="dashboard" style="display:none;">
-    <div class="card-title">דוח התקדמות</div>
+    <div class="card-title">התקדמות</div>
     <div class="progress-header">
       <span id="progressText">0/0 קבוצות</span>
       <span id="progressPercent" style="color:#1877f2;">0%</span>
     </div>
     <div class="progress-bar-wrap">
-      <div class="progress-bar" id="progressBar" style="width:0%"></div>
+      <div class="progress-bar" id="progressBar"></div>
     </div>
     <div class="countdown" id="countdown"></div>
+    <div class="group-stats" id="groupStats"></div>
   </div>
 
-  <!-- Actions -->
-  <div class="action-row" style="flex-wrap:wrap; gap:8px;">
-    <button class="btn btn-success" id="startPostBtn"    style="flex:1 1 45%;">📝 התחל פרסום פוסט</button>
-    <button class="btn btn-primary" id="startCommentBtn" style="flex:1 1 45%;">💬 התחל פרסום תגובה</button>
-    <button class="btn btn-danger"  id="stopBtn" disabled style="flex:1 1 100%;">⏹ עצור הכל</button>
+  <!-- Action Buttons -->
+  <div class="action-row">
+    <button class="btn btn-success btn-start" id="startPostBtn">📝 פרסם פוסט</button>
+    <button class="btn btn-primary btn-start" id="startCommentBtn">💬 פרסם תגובה</button>
+    <button class="btn btn-danger btn-stop" id="stopBtn" disabled>⏹ עצור הכל</button>
   </div>
 
-  <!-- Log panel -->
-  <div id="logSection" style="display:none;">
-    <div style="display:flex; gap:6px;">
-      <button class="log-toggle" id="logToggle" style="flex:1;">
-        <span id="logToggleLabel">📋 לוג ריצה אחרונה</span>
-        <span id="logToggleArrow">▼</span>
-      </button>
-      <button class="btn btn-primary" id="copyLogBtn"
-              style="flex-shrink:0; padding:6px 10px; font-size:12px;">
-        העתק
-      </button>
-      <button class="btn btn-danger" id="clearLogBtn"
-              style="flex-shrink:0; padding:6px 10px; font-size:12px;">
-        נקה
-      </button>
+</div><!-- /tab-main -->
+
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     TAB: GROUPS
+     ════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-pane" id="tab-groups">
+
+  <!-- List View -->
+  <div id="groupsListView">
+
+    <div class="tab-toolbar">
+      <button class="btn btn-primary btn-sm" id="newListBtn">+ רשימה חדשה</button>
     </div>
-    <div id="logPanel" class="log-panel" style="display:none; margin-top:4px;"></div>
+
+    <!-- New List Form (hidden by default) -->
+    <div class="card" id="newListForm" style="display:none;">
+      <div class="card-title">רשימה חדשה</div>
+      <input type="text" id="newListName" placeholder="שם הרשימה...">
+      <div class="form-actions">
+        <button class="btn btn-success btn-sm" id="createListBtn">✔ צור</button>
+        <button class="btn btn-ghost btn-sm" id="cancelNewListBtn">ביטול</button>
+      </div>
+    </div>
+
+    <!-- Lists Container -->
+    <div id="groupListsContainer">
+      <div class="empty-state">אין רשימות עדיין. לחץ "+ רשימה חדשה" להתחיל.</div>
+    </div>
+
+  </div><!-- /groupsListView -->
+
+  <!-- Edit View (hidden by default) -->
+  <div id="groupsEditView" style="display:none;">
+
+    <div class="tab-toolbar">
+      <button class="btn btn-ghost btn-sm" id="backToListsBtn">← חזרה</button>
+      <span id="editListTitle"></span>
+    </div>
+
+    <!-- Rename Card -->
+    <div class="card">
+      <div class="field-label">שם הרשימה</div>
+      <div class="input-row">
+        <input type="text" id="editListName" placeholder="שם הרשימה...">
+        <button class="btn btn-primary btn-sm" id="saveListNameBtn">שמור</button>
+      </div>
+    </div>
+
+    <!-- Groups in List Card -->
+    <div class="card">
+      <div class="card-title">קבוצות ברשימה</div>
+
+      <div class="input-row">
+        <input type="url" id="newGroupUrl" placeholder="הדבק URL של קבוצת פייסבוק...">
+        <button class="btn btn-primary btn-sm" id="addGroupToListBtn">+ הוסף</button>
+      </div>
+
+      <button class="btn btn-ghost btn-sm" id="importGroupsToListBtn" style="width:100%; margin-bottom:8px;">📋 ייבוא רשימה</button>
+
+      <!-- Import Box (hidden by default) -->
+      <div id="importGroupsBox" style="display:none; margin-bottom:8px;">
+        <textarea id="importGroupsInput" placeholder="שורה אחת לכל קבוצה..." style="height:80px;"></textarea>
+        <div class="form-actions">
+          <button class="btn btn-success btn-sm" id="importGroupsConfirmBtn">✔ ייבא</button>
+          <button class="btn btn-danger btn-sm" id="importGroupsCancelBtn">✕ ביטול</button>
+        </div>
+      </div>
+
+      <div class="group-list" id="editGroupList">
+        <div class="empty-state">אין קבוצות ברשימה זו עדיין</div>
+      </div>
+      <div class="group-count" id="editGroupCount"></div>
+    </div>
+
+  </div><!-- /groupsEditView -->
+
+</div><!-- /tab-groups -->
+
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     TAB: SCHEDULE
+     ════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-pane" id="tab-schedule">
+
+  <!-- New Campaign Card -->
+  <div class="card">
+    <div class="card-title">קמפיין חדש</div>
+
+    <div class="field-label">שם הקמפיין</div>
+    <input type="text" id="campName" placeholder="שם הקמפיין...">
+
+    <div class="field-label">תאריך ושעה</div>
+    <input type="datetime-local" id="campDateTime">
+
+    <div class="field-label">רשימת קבוצות</div>
+    <select id="campListSelector">
+      <option value="">— בחר רשימה —</option>
+    </select>
+
+    <div class="field-label">סוג פרסום</div>
+    <select id="campMode">
+      <option value="post">📝 פוסט חדש</option>
+      <option value="comment">💬 תגובה</option>
+    </select>
+
+    <div class="field-label">כותרת</div>
+    <input type="text" id="campTitle" placeholder="כותרת הפוסט...">
+
+    <div class="field-label">תוכן</div>
+    <textarea id="campContent" style="height:65px;" placeholder="תוכן הפוסט..."></textarea>
+
+    <div class="field-label">קישור (אופציונלי)</div>
+    <input type="url" id="campUrl" placeholder="https://...">
+
+    <button class="btn btn-primary" id="scheduleCampBtn" style="width:100%; padding:10px;">🗓 תזמן קמפיין</button>
   </div>
 
-</div>
+  <!-- Upcoming Campaigns Card -->
+  <div class="card">
+    <div class="card-title">קמפיינים מתוזמנים</div>
+    <div id="upcomingCampaigns">
+      <div class="empty-state">אין קמפיינים מתוזמנים</div>
+    </div>
+  </div>
+
+  <!-- Past Campaigns Card -->
+  <div class="card">
+    <div class="card-title">היסטוריה</div>
+    <div id="pastCampaigns">
+      <div class="empty-state">אין קמפיינים בהיסטוריה</div>
+    </div>
+  </div>
+
+</div><!-- /tab-schedule -->
+
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     TAB: REPORTS
+     ════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-pane" id="tab-reports">
+
+  <div class="card">
+    <div class="report-header">
+      <div id="reportStatus" style="color:#bcc0c4;">אין לוג זמין</div>
+      <div style="display:flex; gap:6px; flex-shrink:0;">
+        <button class="btn btn-ghost btn-sm" id="copyLogBtn">📋 העתק</button>
+        <button class="btn btn-danger btn-sm" id="clearLogBtn">🗑 נקה</button>
+      </div>
+    </div>
+    <div class="log-panel" id="logPanel">
+      <div style="color:#606770; text-align:center; padding:10px;">אין נתוני לוג להצגה</div>
+    </div>
+  </div>
+
+</div><!-- /tab-reports -->
+
 
 <script src="popup.js"></script>
 </body>
